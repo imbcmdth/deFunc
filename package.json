@@ -1,0 +1,19 @@
+{
+	"author": "Jon-Carlos Rivera <imbcmdth@hotmail.com>",
+	"name": "deFunc",
+	"description": "Default function arguments helper",
+	"version": "0.0.1",
+	"homepage": "https://github.com/imbcmdth/deFunc",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/imbcmdth/deFunc.git"
+	},
+	"main": "lib/index.js",
+	"engines": {
+		"node": ">=0.4.0"
+	},
+	"dependencies": {},
+	"devDependencies": { 
+		"vows":">=0.6.2"
+	}
+}
