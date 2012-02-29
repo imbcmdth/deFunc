@@ -64,7 +64,10 @@ You can use deFunc to do *partial function application* where we generate functi
 
     source_and_destination_preset("another_file");  // yields arguments: ("/from/here/", "/to/here/", "another_file")
 
-Now, by passing in more data we can override the baked-in parameters!
+Now, by passing in more data we can still override the baked-in parameters!
 
-    source_and_destination_preset("/overridden/dest/", "yet_another_file");  // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
-    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");  // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+    source_and_destination_preset("/overridden/dest/", "yet_another_file"); 
+        // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
+        
+    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file"); 
+        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
