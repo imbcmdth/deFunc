@@ -4,7 +4,7 @@ A simple helper for default function parameters in JavaScript.
 
     wrapped:Function = deFunc(defaults:Array, wrappee:Function);
 
-If the arity of the function is greater than the number of parameters in the *defaults* array, then the remaining parameters to the function are *required*. The required parameters are always placed at the end of the functions (right after the defaults) in order to support the "callback(s)-last" functions that node.js encourages.
+If the arity of the *wrappee* is greater than the number of parameters in the *defaults* array, then the remaining parameters to the *wrappee* are **required**. The required parameters are always placed at the end of the functions (starting right after the *defaults*) in order to support the "callback(s)-last" functions that node.js encourages.
 
 The point of **deFunc()** is to remove the parameter-swizzling preamble which functions are required to employ when they accept several optional parameters along with a required *callback* or *next* function as their final parameter.
 
