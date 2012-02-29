@@ -21,7 +21,7 @@ For example:
     // The following throws a ReferenceError exception because the function requires a minimum of one parameter
     simple_example(); 
 
-## More Advanced Example
+## Another Example
 
 Let's say you have a function that requires two callbacks and several optional parameters.
 
@@ -42,3 +42,29 @@ For example:
     // Both the following throw ReferenceError exceptions because the function requires a minimum of two parameters
     advanced_example("test"); 
     advanced_example(); 
+
+## Advanced Example
+
+You can use deFunc to do *partial function application* where we generate functions with "baked-in" parameters. The benefit of using deFunc is that we can still override previously set parameters.
+
+    var copy_from_to = function(source, destination, filename){
+    	// Do copy
+    };
+    
+    // Bake-in a source for our "copy" function
+    var source_preset = deFunc(
+    	["/from/here/"],
+    	copy_from_to);
+    
+    source_preset("/to/here/", "a_file");           // yields arguments: ("/from/here/", "/to/here/", "a_file")
+
+    var source_and_destination_preset = deFunc(
+    	["/to/here/"],
+    	source_preset);
+
+    source_and_destination_preset("another_file");  // yields arguments: ("/from/here/", "/to/here/", "another_file")
+
+Now, by passing in more data we can override the baked-in parameters!
+
+    source_and_destination_preset("/overridden/dest/", "yet_another_file");  // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
+    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");  // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")

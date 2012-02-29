@@ -78,3 +78,21 @@ try {
 all_required("new_a", "new_function1", "new_function2");
 // Extra options are passed to along to the function after all the named arguments
 all_required("new_a", "new_function1", "new_function2", "extra_arguments");
+
+var copy_from_to = function(source, destination, filename){
+	console.log("copy", filename, "from", source, "to", destination);
+};
+
+var source_preset = deFunc(
+	["/from/here/"],
+	copy_from_to);
+
+source_preset("/to/here/", "a_file");
+
+var source_and_destination_preset = deFunc(
+	["/to/here/"],
+	source_preset);
+
+source_and_destination_preset("another_file");
+source_and_destination_preset("/overridden/dest/", "yet_another_file");
+source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");
