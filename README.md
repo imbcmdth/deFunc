@@ -64,7 +64,27 @@ You can use deFunc to do *partial function application* where we generate functi
 
     source_and_destination_preset("another_file");  // yields arguments: ("/from/here/", "/to/here/", "another_file")
 
-Now, by passing in more data we can override the baked-in parameters!
+Now, by passing in more data we can still override the baked-in parameters:
 
-    source_and_destination_preset("/overridden/dest/", "yet_another_file");  // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
-    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");  // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+    source_and_destination_preset("/overridden/dest/", "yet_another_file"); 
+        // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
+
+    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file"); 
+        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+
+The way we define our *partial functions* determines the override-order. The chaining used above means that we override from right-to-left. If we defined both our *source* and *destination* arguments at once, we would override them from left-to-right:
+
+    var source_and_destination_preset2 = deFunc(
+    	["/from/here/", "/to/here/"],
+    	copy_from_to);
+
+Which results in the following when we override the baked-in parameters:
+
+    source_and_destination_preset2("another_file");
+        // yields arguments: ("/from/here/", "/to/here/", "another_file")
+
+    source_and_destination_preset2("/overridden/source/", "yet_another_file");
+        // yields arguments: ("/overridden/source/", "/to/here/", "yet_another_file")
+
+    source_and_destination_preset2("/overridden/source/", "/overridden/dest/", "one_more_file");
+        // yields arguments: ("/from/here/", "/overridden/dest/", "one_more_file")
