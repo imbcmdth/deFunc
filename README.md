@@ -10,87 +10,92 @@ The point of **deFunc()** is to remove the parameter-swizzling preamble which fu
 
 ## Simple Example
 
-    var simple_example = deFunc(
+    var example1 = deFunc(
     	["default_a", "default_b"],
     	function(a, b, fn){
     		// function body
     	});
 
-Now, the function "simple_example" will take between 1 and 3 options. The last parameter (fn) is always the last argument provided.
+Now, the function "simple_example" will take between 1 and 3 options. The last parameter (in this case fn) is always the last argument provided.
 
 For example:
 
-    simple_example("foo");                      // yields arguments: ("default_a", "default_b", "foo")
-    simple_example("test1" "foo");              // yields arguments: ("test1",     "default_b", "foo")
-    simple_example("test1", "test2", "foo");    // yields arguments: ("test1",     "test2",     "foo")
+    example1("foo");                      // yields arguments: ("default_a", "default_b", "foo")
+    example1("test1" "foo");              // yields arguments: ("test1",     "default_b", "foo")
+    example1("test1", "test2", "foo");    // yields arguments: ("test1",     "test2",     "foo")
     
     // The following throws a ReferenceError exception because the function requires a minimum of one parameter
     simple_example(); 
 
 ## Another Example
 
-Let's say you have a function that requires *two* callbacks and takes several optional parameters.
+Let's say you have a function that requires *two* callbacks but also accepts several optional parameters.
 
-    var advanced_example = deFunc(
+    var example2 = deFunc(
     	["default_a", "default_b"],
     	function(a, b, fn1, fn2){
     		// function body
     	});
 
-This function will take between 2 and 4 options.
+The result (example2) will now accept between 2 and 4 options.
 
 For example:
 
-    advanced_example("foo", "bar");                 // yields arguments: ("default_a", "default_b", "foo", "bar")
-    advanced_example("test1", "foo", "bar");        // yields arguments: ("test1",     "default_b", "foo", "bar")
-    advanced_example("test1", "test2" foo","bar");  // yields arguments: ("test1",     "test2",     "foo", "bar")
+    example2("foo", "bar");                   // yields arguments: ("default_a", "default_b", "foo", "bar")
+    example2("test1", "foo", "bar");          // yields arguments: ("test1",     "default_b", "foo", "bar")
+    example2("test1", "test2", "foo", "bar"); // yields arguments: ("test1",     "test2",     "foo", "bar")
     
     // Both the following throw ReferenceError exceptions because the function requires a minimum of two parameters
-    advanced_example("oops"); 
-    advanced_example(); 
+    example2("oops"); 
+    example2(); 
 
 ## Advanced Example
 
-You can use **deFunc()** to do *partial function application* where we generate functions with "baked-in" parameters. The benefit of using **deFunc()** is that we can still override previously set parameters.
+You can use **deFunc()** to do [partial function application](http://en.wikipedia.org/wiki/Partial_application) where we generate functions with "baked-in" parameters. The benefit of using **deFunc()** is that we are able to easily override previously set parameters.
+
+Let's say we had this function: 
 
     var copy_from_to = function(source, destination, filename){
     	// Do copy
     };
-    
-    // Bake-in a source for our "copy" function
-    var source_preset = deFunc(
-    	["/from/here/"],
+
+We can use **deFunc()** to apply *partial function application* to the source and destination parameters:
+
+    var source_and_destination_preset = deFunc(
+    	["/from/here/", "/to/here/"],
     	copy_from_to);
-    
-    source_preset("/to/here/", "a_file");           // yields arguments: ("/from/here/", "/to/here/", "a_file")
+
+    source_and_destination_preset("another_file");
+        // yields arguments: ("/from/here/", "/to/here/", "another_file")
+
+And by passing in more parameters we can still override the default parameters:
+
+    source_and_destination_preset("/overridden/source/", "yet_another_file");
+        // yields arguments: ("/overridden/source/", "/to/here/", "yet_another_file")
+
+    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");
+        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+
+The way we define our *partial functions* using **deFunc()** determines the order that their optional parameters are overridden.
+
+Above, we defined both our *source* and *destination* arguments at once, so the parameters are overridden from left-to-right or *source* first.
+
+The "chaining" method, shown below, allows us to override the optional parameters from right-to-left. In the following example, that means *destination* first. 
 
     var source_and_destination_preset = deFunc(
     	["/to/here/"],
-    	source_preset);
-
+    	deFunc(
+    		["/from/here/"],
+    		copy_from_to
+    	)
+    );
+    
     source_and_destination_preset("another_file");  // yields arguments: ("/from/here/", "/to/here/", "another_file")
 
-By passing in more parameters we can still override the baked-in parameters:
+And that results in the following when we override the baked-in parameters:
 
     source_and_destination_preset("/overridden/dest/", "yet_another_file"); 
         // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
 
     source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file"); 
-        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
-
-The way we define our *partial functions* using **deFunc()** determines the override-order. The "chaining" method used above means that we override from right-to-left. If we defined both our *source* and *destination* arguments at once, we would override them from left-to-right:
-
-    var source_and_destination_preset2 = deFunc(
-    	["/from/here/", "/to/here/"],
-    	copy_from_to);
-
-Which results in the following when we override the baked-in parameters:
-
-    source_and_destination_preset2("another_file");
-        // yields arguments: ("/from/here/", "/to/here/", "another_file")
-
-    source_and_destination_preset2("/overridden/source/", "yet_another_file");
-        // yields arguments: ("/overridden/source/", "/to/here/", "yet_another_file")
-
-    source_and_destination_preset2("/overridden/source/", "/overridden/dest/", "one_more_file");
         // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
