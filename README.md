@@ -87,4 +87,4 @@ Which results in the following when we override the baked-in parameters:
         // yields arguments: ("/overridden/source/", "/to/here/", "yet_another_file")
 
     source_and_destination_preset2("/overridden/source/", "/overridden/dest/", "one_more_file");
-        // yields arguments: ("/from/here/", "/overridden/dest/", "one_more_file")
+        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
