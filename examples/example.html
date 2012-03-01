@@ -1,0 +1,17 @@
+<script src="../min/deFunc.min.js"></script>
+<script>
+
+function test(A, B, C, D, E) {
+	console.log(arguments);
+}
+
+var test2 = 
+	deFunc(
+		test,
+		1,
+		["B'", "C'"]
+	);
+
+test2("A", "b", "D", "E");
+
+</script>
