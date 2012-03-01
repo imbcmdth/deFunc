@@ -1,43 +1,32 @@
 var deFunc = require('../');
 
+/* THE FOLLOWING ARE IN OLD-STYLE deFunc (v0.0.1) FORMAT */
 // Function's arity is equal to the number of defaults so all are optional
-var all_optional =  deFunc(
-	deFunc(
-		function all_optional(option_a, option_b, fn){
-			console.log("optional", "(", option_a, ", ", option_b, ", ", fn, ") extra: ", Array.prototype.slice.call(arguments, 3));
-		},
-		0,
-		["default_a", "default_b"]
-	),
-	0,
-	["default_function"]
-);
+var all_optional = deFunc(
+	["default_a", "default_b", "default_function"],
+	function all_optional(option_a, option_b, fn){
+		console.log("optional", "(", option_a, ", ", option_b, ", ", fn, ") extra: ", Array.prototype.slice.call(arguments, 3));
+	});
 
 // Function's arity is one greater than defaults so one option (the last) is required
 var one_required = deFunc(
+	["default_a", "default_b"],
 	function one_required(option_a, option_b, fn){
 		console.log("1 required", "(",option_a, ", ", option_b, ", ", fn, ") extra: ", Array.prototype.slice.call(arguments, 3));
-	},
-	0,
-	["default_a", "default_b"]
-);
+	});
 
 // Function's arity is two greater than defaults so two options (the last two) are required
 var two_required = deFunc(
+	["default_a"],
 	function two_required(option_a, fn, fn2){
 		console.log("2 required", "(",option_a, ", ", fn, ", ", fn2, ") extra: ", Array.prototype.slice.call(arguments, 3));
-	},
-	0,
-	["default_a"]
-);
+	});
 
 var all_required = deFunc(
+	[],
 	function all_required(option_a, fn, fn2){
 		console.log("all required", "(",option_a, ", ", fn, ", ", fn2, ") extra: ", Array.prototype.slice.call(arguments, 3));
-	},
-	0,
-	[]
-);
+	});
 
 // all_option = All arguments optional.
 // The last argument, if it exists, is always placed at end of the argument list.
@@ -96,18 +85,14 @@ var copy_from_to = function(source, destination, filename){
 };
 
 var source_preset = deFunc(
-	copy_from_to,
-	0,
-	["/from/here/"]
-);
+	["/from/here/"],
+	copy_from_to);
 
 source_preset("/to/here/", "a_file");
 
 var source_and_destination_preset = deFunc(
-	source_preset,
-	0,
-	["/to/here/"]
-);
+	["/to/here/"],
+	source_preset);
 
 source_and_destination_preset("another_file");
 source_and_destination_preset("/overridden/dest/", "yet_another_file");

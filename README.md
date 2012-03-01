@@ -1,101 +1,94 @@
-# deFunc
+# deFunc v0.0.2
 
-A simple helper for default function parameters in JavaScript.
+A simple helper for default function parameters in JavaScript with a twist.
 
-    wrapped:Function = deFunc(defaults:Array, wrappee:Function);
+    wrapped:Function = deFunc(wrappee:Function, offset:Number, defaults:Array);
 
-If the arity of the *wrappee* is greater than the number of parameters in the *defaults* array, then the remaining parameters to the *wrappee* are **required**. The required parameters are always placed at the end of the functions (starting right after the *defaults*) in order to support the "callback(s)-last" functions that node.js encourages.
+Where:
 
-The point of **deFunc()** is to remove the parameter-swizzling preamble which functions are required to employ when they accept several optional parameters along with a required *callback* or *next* function as their final parameter.
+* **wrappee** is the function to which you want to add deFunc functionality
+* **defaults** is an array of default values for the *wrappee*
+* **offset** is the zero-based offset into the parameter list where the *defaults* begin
 
-## Simple Example
+The easiest way to understand **deFunc** is by example.
 
-    var example1 = deFunc(
-    	["default_a", "default_b"],
-    	function(a, b, fn){
-    		// function body
-    	});
+## Basic Usage
 
-Now, the function "simple_example" will take between 1 and 3 options. The last parameter (in this case fn) is always the last argument provided.
+The most straight-forward use for **deFunc** is as a simple default parameter filler. If you have a function:
 
-For example:
+    function foo(A, B, C);
 
-    example1("foo");                      // yields arguments: ("default_a", "default_b", "foo")
-    example1("test1" "foo");              // yields arguments: ("test1",     "default_b", "foo")
-    example1("test1", "test2", "foo");    // yields arguments: ("test1",     "test2",     "foo")
-    
-    // The following throws a ReferenceError exception because the function requires a minimum of one parameter
-    simple_example(); 
+Where all the parameters are optional but you wanted to make sure they were all set to some some reasonable defaults you would use **deFunc** like this:
 
-## Another Example
+    var bar = deFunc(foo, 0, ["a", "b", "c"]);
 
-Let's say you have a function that requires *two* callbacks but also accepts several optional parameters.
+    bar();					-> foo(    "a",     "b",  "c")
+    bar("new_a");			-> foo("new_a",     "b",  "c")
+    bar("new_a", "new_b");	-> foo("new_a", "new_b",  "c")
 
-    var example2 = deFunc(
-    	["default_a", "default_b"],
-    	function(a, b, fn1, fn2){
-    		// function body
-    	});
+And so on.
 
-The result (example2) will now accept between 2 and 4 options.
+## More Basic Usage
 
-For example:
+**deFunc** does *not* require that every one of the function's parameters be set to some default. The parameters that have no default value automatically become *required* parameters.
 
-    example2("foo", "bar");                   // yields arguments: ("default_a", "default_b", "foo", "bar")
-    example2("test1", "foo", "bar");          // yields arguments: ("test1",     "default_b", "foo", "bar")
-    example2("test1", "test2", "foo", "bar"); // yields arguments: ("test1",     "test2",     "foo", "bar")
-    
-    // Both the following throw ReferenceError exceptions because the function requires a minimum of two parameters
-    example2("oops"); 
-    example2(); 
+Required parameters will throw a [ReferenceError](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/ReferenceError) if they are not provided by the caller. With **deFunc** enforcing required parameters for you, your functions don't have to worry about getting "undefined" where it shouldn't be.
 
-## Advanced Example
+Using the same *foo* function defined above you can change the *offset* to 1 and remove the "a" element from the array. Now, the foo's first parameter, A, is required while both B and C remain optional:
 
-You can use **deFunc()** to do [partial function application](http://en.wikipedia.org/wiki/Partial_application) where we generate functions with "baked-in" parameters. The benefit of using **deFunc()** is that we are able to easily override previously set parameters.
+    var bar = deFunc(foo, 1, ["b", "c"]);
 
-Let's say we had this function: 
+    bar();				-> Throws a ReferenceError
+    bar("a'");			-> foo("a'",      "b",  "c")
+    bar("a'", "new_b");	-> foo("a'",  "new_b",  "c")
 
-    var copy_from_to = function(source, destination, filename){
-    	// Do copy
+The real power of **deFunc** lies in **deFunc**'s *offset* parameter. If you change the *offset* back to 0 you can instead define parameters A and B as optional and make C the one that is required:
+
+    var bar = deFunc(foo, 0, ["a", "b"]);
+
+    bar();				-> Throws a ReferenceError
+    bar("c'");			-> foo("a",      "b",  "c'")
+    bar("new_a", "c'");	-> foo("new_a",  "b",  "c'")
+
+## jQuery-like Usage (parameter-swizzling)
+
+In jQuery, many functions have a signature similar to this:
+
+    var jQuery_like = function(id, options, callback){
+    	// function body
     };
 
-We can use **deFunc()** to apply *partial function application* to the source and destination parameters:
+Where the parameter *options* is completely optional but id and callback are both *required*. This means that the function must first check the *callback* parameter and, if it is *undefined*, then perform:
 
-    var source_and_destination_preset = deFunc(
-    	["/from/here/", "/to/here/"],
-    	copy_from_to);
+    callback = options;
+    options = default_options;
 
-    source_and_destination_preset("another_file");
-        // yields arguments: ("/from/here/", "/to/here/", "another_file")
+This is to put the parameters back into the correct places and set *options* to some reasonable default. I call this practice *parameter-swizzling* due to the similarities such a method has in common with [array swizzling](http://en.wikipedia.org/wiki/Swizzling_%28computer_graphics%29) used in GPU programming. The problem is that this is error prone because it requires each of your functions to have a preamble that puts considerable distance between your function's definition and the real function body.
 
-And by passing in more parameters we can still override the default parameters:
+**deFunc** takes all the parameter-swizzling logic out of your functions so you can be sure that you always get *every* parameter in exactly the right locations along with default values filling in the parameters that are optional and were not provided by the caller.
 
-    source_and_destination_preset("/overridden/source/", "yet_another_file");
-        // yields arguments: ("/overridden/source/", "/to/here/", "yet_another_file")
+In the jQuery_function example, you would use **deFunc** like this:
 
-    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file");
-        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+    var new_jQuery_like = deFunc(jQuery_like, 1, [{default:options}]);
 
-The way we define our *partial functions* using **deFunc()** determines the order that their optional parameters are overridden.
+This tells **deFunc** to take the "jQuery_like" function (which takes three parameters) and return a new function that takes two required parameters with a single optional parameter. **deFunc** takes care of the rest of the *parameter-swizzling*!
 
-Above, we defined both our *source* and *destination* arguments at once, so the parameters are overridden from left-to-right or *source* first.
+    new_jQuery_like("#id");						-> Throws a ReferenceError
+    new_jQuery_like("#id", fn);					-> jQuery_like("#id", {default:options}, fn)
+    new_jQuery_like("#id", {new:options}, fn);	-> jQuery_like("#id", {new:options},     fn)
 
-The "chaining" method, shown below, allows us to override the optional parameters from right-to-left. In the following example, that means *destination* first. 
+## Advanced Usage
 
-    var source_and_destination_preset = deFunc(
-    	["/to/here/"],
-    	deFunc(
-    		["/from/here/"],
-    		copy_from_to
-    	)
-    );
-    
-    source_and_destination_preset("another_file");  // yields arguments: ("/from/here/", "/to/here/", "another_file")
+Bulding on the jQuery example above, lets say that you wanted a function where both the *options* and the *callback* parameter were optional but the *callback* had a higher precedence. You can do this quite easily with **deFunc** by nesting **deFunc** calls. 
 
-And that results in the following when we override the baked-in parameters:
+Using the same *new_jQuery_like* function already defined, you can wrap it again using **deFunc** like this:
 
-    source_and_destination_preset("/overridden/dest/", "yet_another_file"); 
-        // yields arguments: ("/from/here/", "/overridden/dest/", "yet_another_file")
+    var advanced_jQuery_like = deFunc(new_jQuery_like, 1, [default_fn]);
 
-    source_and_destination_preset("/overridden/source/", "/overridden/dest/", "one_more_file"); 
-        // yields arguments: ("/overridden/source/", "/overridden/dest/", "one_more_file")
+    advanced_jQuery_like("#id");					-> jQuery_like("#id", {default:options}, default_fn)
+    advanced_jQuery_like("#id", fn);				-> jQuery_like("#id", {default:options},         fn)
+    advanced_jQuery_like("#id", {new:options}, fn);	-> jQuery_like("#id", {new:options},             fn)
+
+One thing to note: Even though the *callback* parameter is the third parameter in the original function (jQuery_like), when you wrapped it with **deFunc** it became the second **required** parameter. **deFunc** is only concerned with required parameters.
+
+Initially, **deFunc** considers all of your functions parameters required. This means that when you go to wrap your function a second time, the position of arguments has changed because only required parameters are able to be **deFunc**'d. In fact, **deFunc** will throw an error if you try to pass more default options than there are required parameters remaining.
