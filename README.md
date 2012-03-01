@@ -63,11 +63,11 @@ Where the parameter *options* is completely optional but both *id* and *callback
     callback = options;
     options = default_options;
 
-This is done in order to place the parameters back into the correct arguments and set also *options* to some reasonable default. I call this practice **parameter-swizzling** due to the similarities such a method has in common with [array swizzling](http://en.wikipedia.org/wiki/Swizzling_%28computer_graphics%29) used in GPU programming.
+This is done in order to place the parameters back into the correct arguments and also set *options* to some reasonable default. I call this practice **parameter-swizzling** due to the similarities such a method has in common with [array swizzling](http://en.wikipedia.org/wiki/Swizzling_%28computer_graphics%29) used in GPU programming.
 
 The problem is that **parameter swizzling** done in this way is error prone and it requires each of your functions to have a preamble that puts considerable distance between your function's definition and the real function body.
 
-**deFunc** takes all the parameter-swizzling logic out of your functions so you can be sure that you always get *every* parameter in exactly the right locations along with default values filling in the parameters that are optional and were not provided by the caller.
+**deFunc** takes all the **parameter-swizzling** logic out of your functions so you can be sure that you always get *every* parameter in exactly the right locations along with default values filling in the parameters that are optional and were not provided by the caller.
 
 Using *fubar* defined above, you would use **deFunc** like this:
 
@@ -93,4 +93,4 @@ Using the same *fubar* function already defined, you can wrap it *twice* using *
 
 One thing to note: Even though the *callback* parameter is the third parameter in the original function (*fubar*), when you wrapped *fubar* with **deFunc**, *callback* became the second **required** parameter. **deFunc** is only concerned with required parameters.
 
-That means when you go to wrap your function a second time, the position of arguments has changed because only required parameters are able to be **deFunc**'d. In fact, **deFunc** will throw an error if you try to pass more default options than there are required parameters remaining.
+That means when you go to wrap your function a second time, the *offset* has changed because only required parameters are able to be **deFunc**'d. In fact, **deFunc** will throw an error if you try to pass more *defaults* than there are required parameters remaining.
