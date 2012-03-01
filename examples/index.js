@@ -62,7 +62,7 @@ one_required("new_function");
 one_required("new_a", "new_function");
 one_required("new_a", "new_b", "new_function");
 // Extra options are passed to along to the function after all the named arguments
-one_required("new_a", "new_b", "new_function1", "extra_arguments");
+one_required("new_a", "new_b", "new_function", "extra_arguments");
 
 // two_required = Two arguments required.
 // The last 2 arguments are always placed at end of the argument list.
