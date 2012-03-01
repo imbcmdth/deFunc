@@ -1,6 +1,6 @@
 # deFunc v0.0.2
 
-A simple helper for default function parameters in JavaScript with a twist.
+A powerful JavaScript helper function for specifying required and optional parameters with default values.
 
     wrapped:Function = deFunc(wrappee:Function, offset:Number, defaults:Array);
 
