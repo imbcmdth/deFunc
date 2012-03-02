@@ -85,7 +85,7 @@ Building on the example above, lets say that you wanted a function where both th
 
 Using the same *fubar* function already defined, you can wrap it *twice* using **deFunc** like this:
 
-    var advanced_fubar = deFunc( deFunc(fubar, 1, [{default:options}]), 1, [default_fn]));
+    var advanced_fubar = deFunc( deFunc(fubar, 1, [{default:options}]), 1, [default_fn]);
 
     advanced_fubar("#id");						-> fubar("#id", {default:options}, default_fn)
     advanced_fubar("#id", fn);					-> fubar("#id", {default:options},         fn)
