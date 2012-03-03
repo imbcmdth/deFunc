@@ -161,8 +161,6 @@ I hope that helps!
 
 ## Change History
 
-*0.0.3* - Fixed deFunc-wrapped functions not returning values
-
-*0.0.2* - Rewrote deFunc to make it more flexible and powerful
-
-*0.0.1* - Initial release
+    *0.0.3* - Fixed deFunc-wrapped functions not returning values
+    *0.0.2* - Rewrote deFunc to make it more flexible and powerful
+    *0.0.1* - Initial release
