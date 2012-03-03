@@ -1,26 +1,28 @@
 # deFunc v0.0.3
 
-A powerful JavaScript helper function for specifying required and optional parameters with default values.
+A powerful JavaScript helper function for specifying both required parameters and optional parameters with default values.
 
-    wrapped:Function = deFunc(wrappee:Function, offset:Number, defaults:Array);
+````javascript
+wrapped = deFunc(wrappee, offset, defaults);
+````
 
 Where:
 
-* **wrappee** is the function to which you want to add **deFunc** functionality
-* **offset** is the zero-based offset into the parameter list where the *defaults* begin
-* **defaults** is an array of default values for the *wrappee*'s parameters
+* **wrappee** A function to which you want to add **deFunc** functionality
+* **offset** A number that represents the zero-based offset into *wrappee*'s parameters where the *defaults* begin
+* **defaults** An array of default values for *wrappee*'s parameters
 
-The easiest way to understand **deFunc** is by example.
+Parameters that are given default values become optional parameters. Otherwise, they become required parameters.
 
 ## Basic Usage
 
-The most straight-forward use for **deFunc** is as a simple default parameter filler. If you have a function with the signature:
+Let's say that you have a function with the signature:
 
     function([A, B, C])
 
-**NOTE** Square brackets are used in function signatures to denote optional parameters. As shown below, you would not use them in actual JavaScript code.
+**NOTE** *Square brackets are used in function signatures as a short-hand to denote optional parameters. You would **not** use them in actual JavaScript code.*
 
-For this kind of function, all the parameters are completely optional but you usually want to make sure that the parameters are all set to some some reasonable defaults if not provided by the caller. To do this you would use **deFunc** like this:
+In this function, all the parameters are completely optional but you usually want to make sure that the parameters are all set to some some reasonable defaults if not provided by the caller. To do this you would use **deFunc** like this:
 
 ```javascript
 var foo = function(A, B, C) { /* function body */ };
@@ -31,11 +33,11 @@ bar();					// -> foo(    "a",     "b",  "c")
 bar("new_a");			// -> foo("new_a",     "b",  "c")
 bar("new_a", "new_b");	// -> foo("new_a", "new_b",  "c")
 ````
-Optional parameters are always filled in from left to right. So to set *C*, you **must** first provide both *A* and *B*.
+Optional parameters are always filled in from left to right. To set *C*, you **must** first provide both *A* and *B*.
 
 ## More Usage
 
-**deFunc** does not require that every function parameter is set to some default. Parameters without a default value automatically become *required* parameters.
+**deFunc** does not require that every function parameter is provided some default. Parameters without a default value automatically become *required* parameters.
 
 Required parameters will throw a [ReferenceError](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/ReferenceError) if they are not provided by the caller. With **deFunc** enforcing required parameters for you, your functions don't have to worry about getting "undefined" where it shouldn't be.
 
@@ -75,10 +77,10 @@ jQuery, for example, has many functions with a signature similar to this:
 
     function(id[, options], callback)
 
-Where the parameter *options* is completely optional but both *id* and *callback* are required. Usually, this means that the function must do have something along the line of the following immediately before the main body of code:
+Where the parameter *options* is completely optional but both *id* and *callback* are required. Usually, this means that immediately before the main body of code the function must have something like this:
 
 ```javascript
-if(typeof callback == "undefined") {
+if(typeof callback === "undefined") {
     callback = options;
     options = default_options;
 }
@@ -124,11 +126,13 @@ baz("#id", fn);					// -> foo("#id", {default:options},         fn)
 baz("#id", {new:options}, fn);	// -> foo("#id", {new:options},             fn)
 ````
 
-**NOTE** Even though the *callback* parameter is the third parameter in the original function (*foo*), when you wrapped *foo* with **deFunc**, *callback* became the second **required** parameter. **deFunc** is only concerned with required parameters.
+## Explaining Advanced Usage
+
+Even though the *callback* parameter is the third parameter in the original function (*foo*), when you wrapped *foo* with **deFunc**, *callback* became the second **required** parameter. **deFunc** is only concerned with required parameters.
 
 That means when you go to wrap your function a second time, the *offset* has changed because only required parameters are able to be **deFunc**'d. In fact, **deFunc** will throw an error if you try to pass more *defaults* than there are required parameters remaining.
 
-In order to visualize this process let's go through the process of nesting **deFunc** calls. Each function has the *offsets* explicitly shown below to help in understanding the process.
+In order to visualize this process let's go step by step through the process of nesting **deFunc** calls and the results. Each function has the *offsets* explicitly shown below to help in understanding the process.
 
 First, you start with:
 
@@ -137,21 +141,23 @@ First, you start with:
 
 Then make offset 1 (B) optional with:
 
-    foo = deFunc(foo, 1, [B's default value])
+    bar = deFunc(foo, 1, [B's default value])
 
 Which resulting in:
 
-    foo     (A[, B], C) 
+    bar     (A[, B], C) 
     offsets  0       1    // B no longer has an "offset" value because it has become optional
 
 Then make offset 1 (C) optional with:
 
-    foo = deFunc(foo, 1, [C's default value])
+    baz = deFunc(bar, 1, [C's default value])
 
 Which resulting in our final function:
 
-    foo     (A[[, B], C])
-    offsets  0            // Finally, A has an "offset" value because it's the only remaining required parameter
+    baz     (A[[, B], C])
+    offsets  0            // Finally, only A has an "offset" value because it's the only remaining required parameter
+
+I hope that helps!
 
 ## Change History
 
