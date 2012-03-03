@@ -126,7 +126,7 @@ baz("#id", fn);					// -> foo("#id", {default:options},         fn)
 baz("#id", {new:options}, fn);	// -> foo("#id", {new:options},             fn)
 ````
 
-## Explaining Advanced Usage
+## Advanced Usage Explained
 
 Even though the *callback* parameter is the third parameter in the original function (*foo*), when you wrapped *foo* with **deFunc**, *callback* became the second **required** parameter. **deFunc** is only concerned with required parameters.
 
