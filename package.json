@@ -2,7 +2,7 @@
 	"author": "Jon-Carlos Rivera <imbcmdth@hotmail.com>",
 	"name": "deFunc",
 	"description": "Default function arguments helper",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"homepage": "https://github.com/imbcmdth/deFunc",
 	"repository": {
 		"type": "git",
